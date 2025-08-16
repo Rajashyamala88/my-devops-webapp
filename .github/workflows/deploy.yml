@@ -37,4 +37,5 @@ jobs:
             --registry-username ${{ secrets.ACR_USERNAME }} \
             --registry-password ${{ secrets.ACR_PASSWORD }} \
             --dns-name-label mywebappdemo123 \
-            --ports 3001
+            --ports 3001 \
+            --os-type Linux
