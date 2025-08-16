@@ -1,4 +1,4 @@
-name: Build and Deploy WebApp
+name: Deploy to Azure Container Instances
 
 on:
   push:
@@ -20,16 +20,21 @@ jobs:
 
       - name: Log in to ACR
         run: |
-          echo ${{ secrets.ACR_PASSWORD }} | docker login ${{ secrets.ACR_NAME }}.azurecr.io \
-            -u ${{ secrets.ACR_USERNAME }} --password-stdin
+          az acr login --name ${{ secrets.ACR_NAME }}
 
       - name: Build and Push Docker image
         run: |
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/webapp:latest .
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/webapp:latest
 
-      - name: Deploy WebApp to Azure
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: my-webapp-app       # నీ App Service పేరు ఇక్కడ పెట్టాలి
-          images: ${{ secrets.ACR_NAME }}.azurecr.io/webapp:latest
+      - name: Deploy to ACI
+        run: |
+          az container create \
+            --resource-group ${{ secrets.AZURE_RG }} \
+            --name my-webapp-app \
+            --image ${{ secrets.ACR_NAME }}.azurecr.io/webapp:latest \
+            --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
+            --registry-username ${{ secrets.ACR_USERNAME }} \
+            --registry-password ${{ secrets.ACR_PASSWORD }} \
+            --dns-name-label mywebappdemo123 \
+            --ports 3001
