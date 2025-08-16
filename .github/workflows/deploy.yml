@@ -30,7 +30,7 @@ jobs:
       - name: Deploy to ACI
         run: |
           az container create \
-            --resource-group ${{ secrets.AZURE_RG }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
             --name my-webapp-app \
             --image ${{ secrets.ACR_NAME }}.azurecr.io/webapp:latest \
             --registry-login-server ${{ secrets.ACR_NAME }}.azurecr.io \
